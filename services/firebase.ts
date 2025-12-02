@@ -1,6 +1,50 @@
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { Candidate, Job, ApplicationStatus, EmailTemplate } from '../types';
 
-// Mock Data Service
+// Helper para acessar variáveis de ambiente de forma segura, evitando erros se import.meta.env for undefined
+const getEnv = (key: string, fallback: string) => {
+  try {
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
+      // @ts-ignore
+      return import.meta.env[key];
+    }
+  } catch (e) {
+    // Silently ignore errors
+  }
+  return fallback;
+};
+
+// Configuração do Firebase com Fallback para as credenciais fornecidas
+const firebaseConfig = {
+  apiKey: getEnv('VITE_FIREBASE_API_KEY', 'AIzaSyD54i_1mQdEbS3ePMxhCkN2bhezjcq7xEg'),
+  authDomain: getEnv('VITE_FIREBASE_AUTH_DOMAIN', 'young-talents-ats.firebaseapp.com'),
+  projectId: getEnv('VITE_FIREBASE_PROJECT_ID', 'young-talents-ats'),
+  storageBucket: getEnv('VITE_FIREBASE_STORAGE_BUCKET', 'young-talents-ats.firebasestorage.app'),
+  messagingSenderId: getEnv('VITE_FIREBASE_MESSAGING_SENDER_ID', '436802511318'),
+  appId: getEnv('VITE_FIREBASE_APP_ID', '1:436802511318:web:c7f103e4b09344f9bf4477')
+};
+
+// Inicializa o Firebase
+let app;
+let db: any;
+let auth: any;
+
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  auth = getAuth(app);
+  console.log("Firebase inicializado com sucesso.");
+} catch (error) {
+  console.error("Erro ao inicializar Firebase:", error);
+}
+
+export { db, auth };
+
+// --- MOCK DATA (Mantido para funcionamento da UI enquanto o DB não é populado) ---
+
 export const mockCandidates: Candidate[] = [
   {
     id: '1',
@@ -14,6 +58,10 @@ export const mockCandidates: Candidate[] = [
     city: 'São Paulo',
     salaryExpectation: 'R$ 15.000,00',
     experience: '5 anos no Google',
+    education: 'Ciência da Computação - USP',
+    interestAreas: ['Frontend', 'UI/UX'],
+    maritalStatus: 'Solteiro(a)',
+    source: 'LinkedIn',
     aiScore: 88,
     aiSummary: 'Forte correspondência técnica. Experiência alinhada com expectativas sênior.'
   },
@@ -40,6 +88,7 @@ export const mockCandidates: Candidate[] = [
     city: 'Curitiba',
     salaryExpectation: 'R$ 12.000,00',
     appliedDate: '2024-05-11',
+    hasDriverLicense: true,
     aiScore: 65,
     aiSummary: 'Bons fundamentos de frontend, mas falta profundidade em TypeScript exigida para a vaga Senior.'
   }
@@ -102,8 +151,6 @@ export const parseCSVToCandidates = (csvText: string): Candidate[] => {
     
     if (values.length < 3) continue;
 
-    // Mapeamento simplificado baseado nas colunas solicitadas
-    // Assumindo ordem aproximada ou mapeamento direto para demonstração
     const candidate: Candidate = {
       id: `imported-${Date.now()}-${i}`,
       timestamp: values[0] || new Date().toISOString(),
@@ -111,8 +158,8 @@ export const parseCSVToCandidates = (csvText: string): Candidate[] => {
       email: values[6] || 'sem-email@exemplo.com',
       phone: values[7] || '',
       city: values[8] || '',
-      role: values[9] || 'Banco de Talentos', // Áreas de interesse
-      skills: [values[10], values[12]].filter(Boolean) as string[], // Formação + Cursos como skills
+      role: values[9] || 'Banco de Talentos', 
+      skills: [values[10], values[12]].filter(Boolean) as string[],
       status: ApplicationStatus.INSCRITO,
       appliedDate: new Date().toISOString().split('T')[0],
       source: 'Importação CSV'
