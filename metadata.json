@@ -1,5 +1,5 @@
 {
-  "name": "Young ATS - AI Powered",
-  "description": "A modern Applicant Tracking System with Gemini AI integration, Firebase sync, and Space Grotesk branding.",
+  "name": "Young Talents",
+  "description": "Sistema de Rastreamento de Candidatos (ATS) moderno com integração Gemini AI, sincronização Firebase e identidade visual Space Grotesk.",
   "requestFramePermissions": []
 }

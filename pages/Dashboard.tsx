@@ -19,48 +19,48 @@ const StatCard = ({ title, value, icon: Icon, colorClass }: any) => (
 
 const Dashboard = () => {
   const data = [
-    { name: 'Mon', applicants: 4 },
-    { name: 'Tue', applicants: 7 },
-    { name: 'Wed', applicants: 12 },
-    { name: 'Thu', applicants: 8 },
-    { name: 'Fri', applicants: 15 },
-    { name: 'Sat', applicants: 3 },
-    { name: 'Sun', applicants: 2 },
+    { name: 'Seg', applicants: 4 },
+    { name: 'Ter', applicants: 7 },
+    { name: 'Qua', applicants: 12 },
+    { name: 'Qui', applicants: 8 },
+    { name: 'Sex', applicants: 15 },
+    { name: 'Sáb', applicants: 3 },
+    { name: 'Dom', applicants: 2 },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Welcome back, Recruiter</h1>
-          <p className="text-slate-500 dark:text-slate-400">Here is what's happening at Young Empreendimentos today.</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Olá, Recrutador</h1>
+          <p className="text-slate-500 dark:text-slate-400">Aqui está o que está acontecendo na Young Talents hoje.</p>
         </div>
         <button className="bg-brand-orange text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-lg shadow-brand-orange/20">
-          + Post New Job
+          + Criar Nova Vaga
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
-          title="Total Candidates" 
+          title="Total de Candidatos" 
           value={mockCandidates.length} 
           icon={Users} 
           colorClass="bg-blue-500" 
         />
         <StatCard 
-          title="Active Jobs" 
+          title="Vagas Ativas" 
           value={mockJobs.filter(j => j.active).length} 
           icon={Briefcase} 
           colorClass="bg-brand-teal" 
         />
         <StatCard 
-          title="Interviews" 
+          title="Entrevistas Agendadas" 
           value="4" 
           icon={Clock} 
           colorClass="bg-brand-orange" 
         />
         <StatCard 
-          title="Hired this Month" 
+          title="Contratados no Mês" 
           value="12" 
           icon={CheckCircle} 
           colorClass="bg-green-500" 
@@ -69,7 +69,7 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white dark:bg-brand-surface p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="text-lg font-bold mb-4">Application Trends</h2>
+          <h2 className="text-lg font-bold mb-4">Tendência de Inscrições</h2>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
@@ -90,14 +90,14 @@ const Dashboard = () => {
         </div>
 
         <div className="bg-white dark:bg-brand-surface p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-          <h2 className="text-lg font-bold mb-4">Recent Activity</h2>
+          <h2 className="text-lg font-bold mb-4">Atividade Recente</h2>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-start gap-3 pb-3 border-b border-slate-100 dark:border-slate-800 last:border-0">
                 <div className="w-2 h-2 rounded-full bg-brand-orange mt-2" />
                 <div>
-                  <p className="text-sm font-medium">New application received</p>
-                  <p className="text-xs text-slate-500">Frontend Dev • 2 hours ago</p>
+                  <p className="text-sm font-medium">Nova inscrição recebida</p>
+                  <p className="text-xs text-slate-500">Engenharia Frontend • 2 horas atrás</p>
                 </div>
               </div>
             ))}

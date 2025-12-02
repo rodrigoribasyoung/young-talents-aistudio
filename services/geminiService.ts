@@ -5,30 +5,35 @@ import { Candidate, Job } from "../types";
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || 'DEMO_KEY' });
 
 export const analyzeCandidate = async (candidate: Candidate, job: Job): Promise<{ score: number; summary: string }> => {
-  // In a real app, this text would come from the parsed PDF resume
+  // Dados do candidato formatados para o prompt
   const candidateProfile = `
-    Name: ${candidate.name}
-    Skills: ${candidate.skills.join(', ')}
-    Role Applied: ${candidate.role}
+    Nome: ${candidate.name}
+    Habilidades/Formação: ${candidate.skills.join(', ')}
+    Experiência: ${candidate.experience || 'Não informado'}
+    Educação: ${candidate.education || 'Não informado'}
+    Resumo Pessoal: ${candidate.aboutMe || 'Não informado'}
+    Vaga Aplicada: ${candidate.role}
   `;
 
   const jobDetails = `
-    Title: ${job.title}
-    Description: ${job.description}
-    Requirements: ${job.requirements.join(', ')}
+    Título: ${job.title}
+    Descrição: ${job.description}
+    Requisitos: ${job.requirements.join(', ')}
   `;
 
   const prompt = `
-    You are an expert HR Recruiter for Young Empreendimentos.
-    Analyze the following candidate against the job description.
+    Você é um Recrutador de RH especialista da Young Empreendimentos (Young Talents).
+    Analise o seguinte candidato em relação à descrição da vaga.
     
-    Candidate Profile:
+    Perfil do Candidato:
     ${candidateProfile}
     
-    Job Description:
+    Descrição da Vaga:
     ${jobDetails}
     
-    Return a JSON object with a 'score' (0-100 integer) and a 'summary' (max 50 words string).
+    Retorne um objeto JSON com:
+    - 'score' (inteiro de 0-100 indicando a aderência à vaga)
+    - 'summary' (string de no máximo 60 palavras em Português do Brasil, resumindo os pontos fortes e fracos).
   `;
 
   try {
@@ -50,22 +55,22 @@ export const analyzeCandidate = async (candidate: Candidate, job: Job): Promise<
     const result = JSON.parse(response.text || '{}');
     return {
       score: result.score || 0,
-      summary: result.summary || "Unable to generate summary."
+      summary: result.summary || "Não foi possível gerar o resumo."
     };
   } catch (error) {
     console.error("Gemini Analysis Failed:", error);
     return {
       score: 0,
-      summary: "AI Analysis failed. Please check API Key."
+      summary: "Falha na análise da IA. Verifique a chave da API."
     };
   }
 };
 
 export const generateInterviewQuestions = async (candidate: Candidate, job: Job): Promise<string[]> => {
   const prompt = `
-    Generate 3 specific, technical, and behavioral interview questions for ${candidate.name} applying for ${job.title}.
-    Focus on their skills: ${candidate.skills.join(', ')}.
-    Return as a simple JSON array of strings.
+    Gere 3 perguntas de entrevista específicas, técnicas e comportamentais para ${candidate.name} que está se candidatando para ${job.title}.
+    Foque nas habilidades mencionadas: ${candidate.skills.join(', ')}.
+    Retorne apenas um array JSON simples de strings em Português do Brasil.
   `;
 
   try {
@@ -78,9 +83,9 @@ export const generateInterviewQuestions = async (candidate: Candidate, job: Job)
     });
 
     const result = JSON.parse(response.text || '[]');
-    return Array.isArray(result) ? result : ["Tell me about yourself."];
+    return Array.isArray(result) ? result : ["Fale um pouco sobre você."];
   } catch (error) {
     console.error("Gemini Questions Failed:", error);
-    return ["Tell me about your experience."];
+    return ["Fale um pouco sobre sua experiência."];
   }
 };
