@@ -1,10 +1,3 @@
-VITE_FIREBASE_API_KEY=AIzaSyD54i_1mQdEbS3ePMxhCkN2bhezjcq7xEg
-VITE_FIREBASE_AUTH_DOMAIN=young-talents-ats.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=young-talents-ats
-VITE_FIREBASE_STORAGE_BUCKET=young-talents-ats.firebasestorage.app
-VITE_FIREBASE_MESSAGING_SENDER_ID=436802511318
-VITE_FIREBASE_APP_ID=1:436802511318:web:c7f103e4b09344f9bf4477
-
 import { Candidate, Job, ApplicationStatus, EmailTemplate } from '../types';
 
 // Mock Data Service
