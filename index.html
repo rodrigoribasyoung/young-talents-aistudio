@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (CDN mantido para simplicidade de configuração visual) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -23,8 +23,8 @@
               brand: {
                 orange: '#fe5009',
                 teal: '#00bcbc',
-                dark: '#0f172a', // Slate 900 base
-                surface: '#1e293b', // Slate 800 surface
+                dark: '#0f172a',
+                surface: '#1e293b',
               }
             }
           }
@@ -35,7 +35,6 @@
       body {
         font-family: 'Space Grotesk', sans-serif;
       }
-      /* Custom Scrollbar for SaaS look */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -54,22 +53,22 @@
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "react": "https://aistudiocdn.com/react@^19.2.0",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
     "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
-    "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
-    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/"
+    "vite": "https://aistudiocdn.com/vite@^7.2.6",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
   }
 }
 </script>
 </head>
   <body class="bg-gray-50 dark:bg-brand-dark text-slate-900 dark:text-slate-100 transition-colors duration-200">
     <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>
