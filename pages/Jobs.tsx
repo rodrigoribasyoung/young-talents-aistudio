@@ -1,21 +1,122 @@
 import React, { useState } from 'react';
 import { mockJobs } from '../services/firebase';
+import { Job } from '../types';
 import { Button } from '../components/ui/Button';
-import { MapPin, Briefcase, Calendar, MoreVertical, Search } from 'lucide-react';
+import { Modal } from '../components/ui/Modal';
+import { MapPin, Briefcase, Calendar, MoreVertical, Search, Plus } from 'lucide-react';
 
 const Jobs = () => {
+  const [jobs, setJobs] = useState(mockJobs);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newJob, setNewJob] = useState<Partial<Job>>({
+    title: '',
+    department: '',
+    location: '',
+    type: 'Tempo Integral',
+    description: '',
+    requirements: []
+  });
 
-  const filteredJobs = mockJobs.filter(job => 
+  const filteredJobs = jobs.filter(job => 
     job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     job.department.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleCreateJob = () => {
+    if (!newJob.title || !newJob.department) {
+      alert("Preencha os campos obrigatórios");
+      return;
+    }
+
+    const jobToAdd: Job = {
+      id: Date.now().toString(),
+      title: newJob.title || 'Nova Vaga',
+      department: newJob.department || 'Geral',
+      location: newJob.location || 'Remoto',
+      type: newJob.type as any || 'Tempo Integral',
+      description: newJob.description || '',
+      requirements: newJob.requirements || [],
+      postedDate: new Date().toLocaleDateString('pt-BR'),
+      active: true
+    };
+
+    setJobs([jobToAdd, ...jobs]);
+    setIsModalOpen(false);
+    setNewJob({ title: '', department: '', location: '', type: 'Tempo Integral', description: '', requirements: [] });
+  };
+
   return (
     <div className="space-y-6">
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Criar Nova Vaga"
+        footer={
+            <div className="flex justify-end gap-2 w-full">
+                <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Cancelar</Button>
+                <Button onClick={handleCreateJob}>Publicar Vaga</Button>
+            </div>
+        }
+      >
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-medium mb-1">Título do Cargo *</label>
+                <input 
+                    className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" 
+                    value={newJob.title} 
+                    onChange={e => setNewJob({...newJob, title: e.target.value})}
+                />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium mb-1">Departamento *</label>
+                    <input 
+                        className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" 
+                        value={newJob.department} 
+                        onChange={e => setNewJob({...newJob, department: e.target.value})}
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-1">Tipo</label>
+                    <select 
+                        className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700"
+                        value={newJob.type}
+                        onChange={e => setNewJob({...newJob, type: e.target.value as any})}
+                    >
+                        <option>Tempo Integral</option>
+                        <option>Meio Período</option>
+                        <option>Contrato</option>
+                        <option>Estágio</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label className="block text-sm font-medium mb-1">Localização</label>
+                <input 
+                    className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" 
+                    value={newJob.location} 
+                    onChange={e => setNewJob({...newJob, location: e.target.value})}
+                    placeholder="Ex: São Paulo, SP ou Remoto"
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium mb-1">Descrição</label>
+                <textarea 
+                    className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" 
+                    rows={3}
+                    value={newJob.description} 
+                    onChange={e => setNewJob({...newJob, description: e.target.value})}
+                />
+            </div>
+        </div>
+      </Modal>
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Vagas Ativas</h1>
-        <Button>+ Criar Nova Posição</Button>
+        <Button onClick={() => setIsModalOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" /> Criar Nova Posição
+        </Button>
       </div>
 
       <div className="relative">

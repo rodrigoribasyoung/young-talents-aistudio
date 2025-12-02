@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { mockCandidates, mockJobs, parseCSVToCandidates } from '../services/firebase';
 import { ApplicationStatus, Candidate } from '../types';
 import { Button } from '../components/ui/Button';
-import { Search, Filter, Sparkles, MessageSquare, Users, Upload, ChevronDown, ChevronUp, MapPin, DollarSign, Calendar, LayoutGrid, List } from 'lucide-react';
+import { Modal } from '../components/ui/Modal';
+import { Search, Filter, Sparkles, MessageSquare, Users, Upload, ChevronDown, ChevronUp, MapPin, DollarSign, Calendar, LayoutGrid, List, Plus } from 'lucide-react';
 import { analyzeCandidate, generateInterviewQuestions } from '../services/geminiService';
 import { TransitionModal } from '../components/TransitionModal';
 
@@ -16,11 +17,17 @@ const Candidates = () => {
   // View Mode
   const [viewMode, setViewMode] = useState<'list' | 'board'>('board');
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Modal State for Pipeline Transition
+  const [isTransitionModalOpen, setIsTransitionModalOpen] = useState(false);
   const [pendingMove, setPendingMove] = useState<{candidate: Candidate, targetStatus: ApplicationStatus} | null>(null);
   const [missingFields, setMissingFields] = useState<string[]>([]);
   
+  // Modal State for New Candidate
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newCandidate, setNewCandidate] = useState<Partial<Candidate>>({
+    name: '', email: '', phone: '', role: '', city: ''
+  });
+
   // Filtros
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,6 +46,28 @@ const Candidates = () => {
       case ApplicationStatus.REPROVADO: return 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300 border-l-4 border-red-500';
       default: return 'bg-slate-100 text-slate-700 border-l-4 border-slate-300';
     }
+  };
+
+  const handleAddCandidate = () => {
+    if(!newCandidate.name || !newCandidate.email || !newCandidate.role) {
+        alert("Nome, Email e Vaga são obrigatórios.");
+        return;
+    }
+    const candidateToAdd: Candidate = {
+        id: Date.now().toString(),
+        name: newCandidate.name!,
+        email: newCandidate.email!,
+        phone: newCandidate.phone || '',
+        role: newCandidate.role!,
+        city: newCandidate.city || '',
+        status: ApplicationStatus.INSCRITO,
+        appliedDate: new Date().toLocaleDateString('pt-BR'),
+        skills: [],
+        interestAreas: [],
+    };
+    setCandidates([...candidates, candidateToAdd]);
+    setIsAddModalOpen(false);
+    setNewCandidate({ name: '', email: '', phone: '', role: '', city: '' });
   };
 
   const handleAiAnalysis = async (candidate: Candidate) => {
@@ -108,7 +137,7 @@ const Candidates = () => {
     if (missing.length > 0) {
       setPendingMove({ candidate, targetStatus });
       setMissingFields(missing);
-      setIsModalOpen(true);
+      setIsTransitionModalOpen(true);
     } else {
       // Se não faltar nada, move direto
       updateCandidateStatus(candidate.id, targetStatus);
@@ -119,7 +148,7 @@ const Candidates = () => {
     setCandidates(prev => prev.map(c => 
       c.id === id ? { ...c, status, ...additionalData } : c
     ));
-    setIsModalOpen(false);
+    setIsTransitionModalOpen(false);
     setPendingMove(null);
   };
 
@@ -165,14 +194,52 @@ const Candidates = () => {
       {/* Modal de Transição */}
       {pendingMove && (
         <TransitionModal 
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isTransitionModalOpen}
+          onClose={() => setIsTransitionModalOpen(false)}
           onConfirm={(data) => updateCandidateStatus(pendingMove.candidate.id, pendingMove.targetStatus, data)}
           targetStatus={pendingMove.targetStatus}
           candidate={pendingMove.candidate}
           missingFields={missingFields}
         />
       )}
+
+      {/* Modal de Adicionar Candidato */}
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Novo Candidato"
+        footer={
+            <div className="flex justify-end gap-2 w-full">
+                <Button variant="ghost" onClick={() => setIsAddModalOpen(false)}>Cancelar</Button>
+                <Button onClick={handleAddCandidate}>Salvar</Button>
+            </div>
+        }
+      >
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-medium mb-1">Nome Completo *</label>
+                <input className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" value={newCandidate.name} onChange={e => setNewCandidate({...newCandidate, name: e.target.value})} />
+            </div>
+            <div>
+                <label className="block text-sm font-medium mb-1">E-mail *</label>
+                <input className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" value={newCandidate.email} onChange={e => setNewCandidate({...newCandidate, email: e.target.value})} />
+            </div>
+            <div>
+                <label className="block text-sm font-medium mb-1">Vaga de Interesse *</label>
+                <input className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" value={newCandidate.role} onChange={e => setNewCandidate({...newCandidate, role: e.target.value})} placeholder="Ex: Engenheiro Frontend" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium mb-1">Telefone</label>
+                    <input className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" value={newCandidate.phone} onChange={e => setNewCandidate({...newCandidate, phone: e.target.value})} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-1">Cidade</label>
+                    <input className="w-full p-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700" value={newCandidate.city} onChange={e => setNewCandidate({...newCandidate, city: e.target.value})} />
+                </div>
+            </div>
+        </div>
+      </Modal>
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -205,8 +272,8 @@ const Candidates = () => {
           <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
             <Upload className="w-4 h-4 mr-2" /> Importar CSV
           </Button>
-          <Button variant="primary">
-            + Adicionar
+          <Button variant="primary" onClick={() => setIsAddModalOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" /> Adicionar
           </Button>
         </div>
       </div>
@@ -362,14 +429,14 @@ const Candidates = () => {
             </div>
           </div>
           
-          {/* Painel Detalhes para View List (Simplificado para caber no exemplo) */}
+          {/* Painel Detalhes para View List */}
            <div className="lg:col-span-1 h-[600px] overflow-y-auto custom-scrollbar">
-              {/* O mesmo painel de detalhes do código anterior seria renderizado aqui */}
               {selectedCandidate ? (
                 <div className="bg-white dark:bg-brand-surface p-6 rounded-xl border border-slate-200 dark:border-slate-700">
                    <h2 className="font-bold text-xl">{selectedCandidate.name}</h2>
                    <p className="text-brand-orange mb-4">{selectedCandidate.status}</p>
-                   {/* ... Detalhes simplificados ... */}
+                   <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">{selectedCandidate.email}</p>
+                   <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{selectedCandidate.phone}</p>
                    <Button onClick={() => setSelectedCandidate(null)} variant="outline" size="sm">Fechar Detalhes</Button>
                 </div>
               ) : (

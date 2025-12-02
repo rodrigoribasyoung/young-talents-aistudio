@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -8,7 +8,8 @@ import {
   Menu, 
   Sun, 
   Moon,
-  LogOut
+  LogOut,
+  Camera
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -21,6 +22,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     return localStorage.getItem('theme') === 'dark' || 
            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
   });
+  
+  // Profile Photo State
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(localStorage.getItem('userProfilePhoto'));
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -33,6 +38,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [isDarkMode]);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setProfilePhoto(result);
+        localStorage.setItem('userProfilePhoto', result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
@@ -110,8 +128,26 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <div className="w-8 h-8 rounded-full bg-brand-teal flex items-center justify-center text-white font-bold text-sm">
-              YT
+            
+            {/* User Profile with Upload */}
+            <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept="image/*"
+                onChange={handlePhotoUpload}
+              />
+              <div className="w-8 h-8 rounded-full bg-brand-teal overflow-hidden flex items-center justify-center text-white font-bold text-sm border-2 border-transparent group-hover:border-brand-orange transition-all">
+                {profilePhoto ? (
+                  <img src={profilePhoto} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  "YT"
+                )}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="w-4 h-4 text-white" />
+              </div>
             </div>
           </div>
         </header>
