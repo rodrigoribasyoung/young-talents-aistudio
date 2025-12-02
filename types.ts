@@ -5,7 +5,7 @@ export enum ApplicationStatus {
   TESTES = 'Testes realizados',
   ENTREVISTA_II = 'Entrevista II',
   SELECIONADO = 'Selecionado',
-  REPROVADO = 'Reprovado' // Manter para controle interno
+  REPROVADO = 'Reprovado'
 }
 
 export interface EmailTemplate {
@@ -17,50 +17,53 @@ export interface EmailTemplate {
 }
 
 export interface Candidate {
-  id: string; // ID
-  timestamp?: string; // Carimbo de data/hora
-  name: string; // Nome completo
-  photoUrl?: string; // Nos envie uma foto atual...
-  birthDate?: string; // Data de Nascimento
-  age?: number; // Idade
-  email: string; // E-mail principal
-  phone: string; // Nº telefone celular / Whatsapp
-  city?: string; // Cidade onde reside
-  interestAreas?: string[]; // Áreas de interesse profissional
-  education?: string; // Formação
-  experience?: string; // Experiências anteriores
-  courses?: string; // Cursos e certificações profissionais
-  aboutMe?: string; // Campo Livre, SEJA VOCÊ!
-  schoolingLevel?: string; // Nível de escolaridade
-  maritalStatus?: string; // Estado civil
-  hasDriverLicense?: boolean; // Você possui CNH tipo B?
-  institution?: string; // Instituição de ensino
-  source?: string; // Onde você nos encontrou?
-  applicationType?: string; // Vaga específica ou banco de talentos?
-  role: string; // Mapeado de applicationType ou input manual
-  status: ApplicationStatus; // Etapa_Funil
-  references?: string; // Referências profissionais
-  certifications?: string; // Certificações profissionais
-  resumeUrl?: string; // Anexar currículo
-  portfolioUrl?: string; // Portfólio de trabalho
-  graduationDate?: string; // Data de formatura
-  canRelocate?: boolean; // Teria disponibilidade para mudança de cidade?
-  currentlyStudying?: boolean; // Em caso de curso superior, está cursando...?
-  salaryExpectation?: string; // Qual seria sua expectativa salarial?
-  childrenCount?: string; // Se tem filhos, quantos?
-  referralName?: string; // Você foi indicado por algum colaborador...?
+  id: string;
+  timestamp?: string;
+  name: string;
+  photoUrl?: string;
+  birthDate?: string;
+  age?: number;
+  email: string;
+  phone: string;
+  city?: string;
+  interestAreas?: string[]; // Pode virar string simples na edição rápida
+  education?: string;
+  experience?: string;
+  courses?: string;
+  aboutMe?: string;
+  schoolingLevel?: string;
+  maritalStatus?: string;
+  hasDriverLicense?: boolean;
+  institution?: string;
+  source?: string;
+  applicationType?: string;
+  role: string;
+  status: ApplicationStatus;
+  references?: string;
+  certifications?: string;
+  resumeUrl?: string;
+  portfolioUrl?: string;
+  graduationDate?: string;
+  canRelocate?: boolean;
+  currentlyStudying?: boolean;
+  salaryExpectation?: string;
+  childrenCount?: string;
+  referralName?: string;
   
-  // Internal Tracking
+  // Tracking Interno
   appliedDate: string;
-  firstInterviewDate?: string; // Data Primeira Entrevista
-  testData?: string; // Dados dos testes
-  secondInterviewDate?: string; // Data Segunda Entrevista
-  feedback?: string; // Feedback
+  firstInterviewDate?: string;
+  testData?: string;
+  secondInterviewDate?: string;
+  feedback?: string;
   
   // AI Fields
-  skills: string[]; // Derivado de courses/experience
+  skills: string[];
   aiScore?: number;
   aiSummary?: string;
+
+  // Index signature para acesso dinâmico na validação
+  [key: string]: any;
 }
 
 export interface Job {
